@@ -30,6 +30,15 @@ module MCollective
         result[:facts] = PluginManager["facts_plugin"].get_facts
         result[:collectives] = Config.instance.collectives.sort
 
+        yaml_dir = Config.instance.pluginconf["registration.extra_yaml_dir"] || false
+        # Optionally send a list of extra yaml files
+        if (yaml_dir != false)
+          result[:extra] = {}
+          Dir[yaml_dir + "/*.yaml"].each do | f |
+            result[:extra][File.basename(f).split('.')[0]] = YAML.load_file(f)
+          end
+        end
+
         result
       end
     end
